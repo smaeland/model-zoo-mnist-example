@@ -1,0 +1,2 @@
+# model-zoo-mnist-example
+
