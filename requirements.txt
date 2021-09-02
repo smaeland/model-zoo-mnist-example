@@ -1,4 +1,6 @@
 numpy==1.19.2
-tensorflow
-tensorflow-datasets
+tensorflow==2.6.0
+tensorflow-datasets==4.4.0
 matplotlib
+jupyter
+scikit-learn==0.24.2

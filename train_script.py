@@ -1,16 +1,19 @@
 import numpy as np
 from tensorflow import keras
 
+"""
+https://keras.io/examples/vision/mnist_convnet/
+"""
 
+def preprocess(input_data):
+        
+    # Scale images to the [0, 1] range
+    preprocessed_data = input_data.astype("float32") / 255
 
-def import_mnist_data():
+    # Data has shape (n, height, width), add a channel dimension so it becomes (n, height, width, 1)
+    preprocessed_data = np.expand_dims(preprocessed_data, axis=-1)
 
-    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
-
-    image_dims = x_train.shape[1:]
-    num_train_samples = x_train.shape[0]
-    num_test_samples = x_train.shape[0]
-    print(f'Loaded {num_train_samples} training samples, {num_test_samples} testing samples')
+    return preprocessed_data
 
 
 def construct_cnn_model(input_shape, num_classes):
@@ -21,9 +24,6 @@ def construct_cnn_model(input_shape, num_classes):
             keras.layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
             keras.layers.MaxPooling2D(pool_size=(2, 2)),
             keras.layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
-            keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            keras.layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
-            keras.layers.MaxPooling2D(pool_size=(2, 2)),
             keras.layers.Flatten(),
             keras.layers.Dropout(0.5),
             keras.layers.Dense(num_classes, activation="softmax"),
@@ -45,7 +45,7 @@ def train_cnn_model(X, Y):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     batch_size = 128
-    epochs = 15
+    epochs = 10
 
     model.fit(
         X,
@@ -80,15 +80,16 @@ if __name__ == '__main__':
     y_train = keras.utils.to_categorical(y_train, num_classes)
     y_test = keras.utils.to_categorical(y_test, num_classes)
 
-    # Data has shape (n, height, width), add a channel dimension so it becomes (n, height, width, 1)
-    x_train = np.expand_dims(x_train, axis=-1)
-    x_test = np.expand_dims(x_test, axis=-1)
+    # Preprocess
+    x_train = preprocess(x_train)
+    x_test = preprocess(x_test)
+
 
     # Train
     model = train_cnn_model(x_train, y_train)
 
     # Save the model
-    model.save('cnn-model-v2')
+    model.save('cnn-model-v1')
 
     # Evaluate
     evaluate(model, x_test, y_test)
